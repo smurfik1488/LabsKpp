@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "133136651371",
+    "project_id": "trezo-a5c06",
+    "storage_bucket": "trezo-a5c06.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:133136651371:android:1ecc970ae8e176da1b4d2e",
+        "android_client_info": {
+          "package_name": "mycompany.trezo"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "133136651371-iihoq6ogg07p7jsl9rv5em5ot88u4jbi.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "mycompany.trezo",
+            "certificate_hash": "610b502be5300de5389aac5bc84cb1595e2d16ce"
+          }
+        },
+        {
+          "client_id": "133136651371-dr60p6pit0rffp6inm66mtnk3o2cemgr.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD8D6qjIfRwLdXotUF--VCYzUCyoax8D28"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "133136651371-dr60p6pit0rffp6inm66mtnk3o2cemgr.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "133136651371-g3ardded3l2jrutllr2vrfha1dvieoia.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.collectionerCatalogue"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
