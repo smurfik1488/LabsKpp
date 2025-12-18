@@ -12,6 +12,7 @@ dependencies:
 
   cupertino_icons: ^1.0.8
   provider: ^6.1.2
+  image_picker: ^1.1.2
 
   # ==== Firebase (абсолютно сумісні між собою) ====
   firebase_core: ^4.2.1

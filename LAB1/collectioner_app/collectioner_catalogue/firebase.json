@@ -1,1 +1,51 @@
-{"flutter":{"platforms":{"android":{"default":{"projectId":"trezo-a5c06","appId":"1:133136651371:android:282aba39719a8ef61b4d2e","fileOutput":"android/app/google-services.json"}},"dart":{"lib/firebase_options.dart":{"projectId":"trezo-a5c06","configurations":{"android":"1:133136651371:android:282aba39719a8ef61b4d2e","ios":"1:133136651371:ios:61e8e9783dea80471b4d2e","macos":"1:133136651371:ios:61e8e9783dea80471b4d2e","web":"1:133136651371:web:1aa96763bfe2be461b4d2e","windows":"1:133136651371:web:2c9aa298b42f2c991b4d2e"}}}}}}
+{
+    "flutter":  {
+                    "platforms":  {
+                                      "android":  {
+                                                      "default":  {
+                                                                      "projectId":  "trezo-a5c06",
+                                                                      "appId":  "1:133136651371:android:282aba39719a8ef61b4d2e",
+                                                                      "fileOutput":  "android/app/google-services.json"
+                                                                  }
+                                                  },
+                                      "dart":  {
+                                                   "lib/firebase_options.dart":  {
+                                                                                     "projectId":  "trezo-a5c06",
+                                                                                     "configurations":  {
+                                                                                                            "android":  "1:133136651371:android:282aba39719a8ef61b4d2e",
+                                                                                                            "ios":  "1:133136651371:ios:61e8e9783dea80471b4d2e",
+                                                                                                            "macos":  "1:133136651371:ios:61e8e9783dea80471b4d2e",
+                                                                                                            "web":  "1:133136651371:web:1aa96763bfe2be461b4d2e",
+                                                                                                            "windows":  "1:133136651371:web:2c9aa298b42f2c991b4d2e"
+                                                                                                        }
+                                                                                 }
+                                               }
+                                  }
+                },
+    "emulators":  {
+                      "singleProjectMode":  true,
+                      "auth":  {
+                                   "port":  9099,
+                                   "host":  "0.0.0.0"
+                               },
+                      "firestore":  {
+                                        "port":  8080,
+                                        "host":  "0.0.0.0"
+                                    },
+                      "storage":  {
+                                      "port":  1488,
+                                      "host":  "0.0.0.0"
+                                  },
+                      "ui":  {
+                                 "enabled":  true,
+                                 "port":  1489,
+                                 "host":  "0.0.0.0"
+                             }
+                  },
+    "firestore":  {
+                      "rules":  "firestore.rules"
+                  },
+    "storage":  {
+                    "rules":  "storage.rules"
+                }
+}

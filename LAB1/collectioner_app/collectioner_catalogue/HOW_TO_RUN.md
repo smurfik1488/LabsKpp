@@ -18,7 +18,7 @@
 
 1. Відкрийте термінал у папці проєкту:
    ```
-   cd C:\Users\PC\Desktop\KP\LAB1\collectioner_app\collectioner_catalogue
+   cd C:\Users\PC\Desktop\KP\LabsKpp\LAB1\collectioner_app\collectioner_catalogue
    ```
 
 2. Встановіть залежності:
@@ -93,7 +93,7 @@
 Якщо у вас вже налаштовано все:
 
 ```bash
-cd C:\Users\PC\Desktop\KP\LAB1\collectioner_app\collectioner_catalogue
+cd C:\Users\PC\Desktop\KP\LabsKpp\LAB1\collectioner_app\collectioner_catalogue
 flutter pub get
 flutter run
 ```

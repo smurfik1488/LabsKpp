@@ -1,95 +1,90 @@
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
-import 'package:trezo/models/collection_item.dart';
-import 'package:trezo/repositories/collection_items_repository.dart';
+import 'package:trezo/models/user_collection.dart';
+import 'package:trezo/repositories/collections_repository.dart';
 import 'package:trezo/state/load_status.dart';
 import 'package:trezo/state/mutation_status.dart';
 
-class CollectionItemsProvider extends ChangeNotifier {
-  CollectionItemsProvider({
-    required this.collectionId,
-    required CollectionItemsRepository repository,
-  }) : _repository = repository;
+class CollectionsProvider extends ChangeNotifier {
+  CollectionsProvider({required CollectionsRepository repository})
+      : _repository = repository;
 
-  final String collectionId;
-  final CollectionItemsRepository _repository;
+  final CollectionsRepository _repository;
   LoadStatus status = LoadStatus.idle;
   MutationStatus mutationStatus = MutationStatus.idle;
   String? errorMessage;
   String? mutationError;
-  List<CollectionItem> _items = [];
-  StreamSubscription<List<CollectionItem>>? _subscription;
+  List<UserCollection> _collections = [];
+  StreamSubscription<List<UserCollection>>? _subscription;
 
-  List<CollectionItem> get items => List.unmodifiable(_items);
+  List<UserCollection> get collections => List.unmodifiable(_collections);
 
-  Future<void> loadItems() {
+  void loadCollections() {
     status = LoadStatus.loading;
     errorMessage = null;
     notifyListeners();
 
     _subscription?.cancel();
-    _subscription = _repository.watchItems(collectionId).listen(
-      (items) {
-        _items = items;
+    _subscription = _repository.watchCollections().listen(
+      (collections) {
+        _collections = collections;
         status = LoadStatus.success;
         notifyListeners();
       },
       onError: (error) {
         status = LoadStatus.error;
-        errorMessage = 'Failed to load items.';
+        errorMessage = 'Failed to load collections.';
         notifyListeners();
       },
     );
-
-    return Future.value();
   }
 
-  Future<CollectionItem?> createItem(CollectionItem item) async {
+  Future<UserCollection?> createCollection(UserCollection collection) async {
     mutationStatus = MutationStatus.saving;
     mutationError = null;
     notifyListeners();
 
     try {
-      final created = await _repository.addItem(collectionId, item);
+      final created = await _repository.addCollection(collection);
       mutationStatus = MutationStatus.success;
       return created;
     } catch (e) {
       mutationStatus = MutationStatus.error;
-      mutationError = 'Failed to create item.';
+      mutationError = 'Failed to create collection.';
       return null;
     } finally {
       notifyListeners();
     }
   }
 
-  Future<void> updateItem(CollectionItem item) async {
+  Future<void> updateCollection(UserCollection collection) async {
     mutationStatus = MutationStatus.saving;
     mutationError = null;
     notifyListeners();
 
     try {
-      await _repository.updateItem(collectionId, item);
+      await _repository.updateCollection(collection);
       mutationStatus = MutationStatus.success;
     } catch (e) {
       mutationStatus = MutationStatus.error;
-      mutationError = 'Failed to update item.';
+      mutationError = 'Failed to update collection.';
     } finally {
       notifyListeners();
     }
   }
 
-  Future<void> deleteItem(String itemId) async {
+  Future<void> deleteCollection(String collectionId) async {
     mutationStatus = MutationStatus.saving;
     mutationError = null;
     notifyListeners();
 
     try {
-      await _repository.deleteItem(collectionId, itemId);
+      await _repository.deleteCollection(collectionId);
       mutationStatus = MutationStatus.success;
     } catch (e) {
       mutationStatus = MutationStatus.error;
-      mutationError = 'Failed to delete item.';
+      mutationError = 'Failed to delete collection.';
     } finally {
       notifyListeners();
     }

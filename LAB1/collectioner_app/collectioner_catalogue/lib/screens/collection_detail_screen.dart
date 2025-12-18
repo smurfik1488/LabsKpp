@@ -1,20 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:trezo/models/collection_item.dart';
+import 'package:trezo/models/user_collection.dart';
+import 'package:trezo/repositories/collection_items_repository.dart';
 import 'package:trezo/screens/add_item_screen.dart';
 import 'package:trezo/screens/item_detail_screen.dart';
 import 'package:trezo/state/collection_items_provider.dart';
+import 'package:trezo/state/load_status.dart';
 
 enum SortOption { newest, oldest, priceHigh, priceLow, name }
 
 class CollectionDetailScreen extends StatefulWidget {
-  final String title;
-  final String subtitle;
+  final UserCollection collection;
 
   const CollectionDetailScreen({
     super.key,
-    required this.title,
-    this.subtitle = '',
+    required this.collection,
   });
 
   @override
@@ -31,7 +32,10 @@ class _CollectionDetailScreenState extends State<CollectionDetailScreen> {
   @override
   void initState() {
     super.initState();
-    _provider = CollectionItemsProvider(widget.title)..loadItems();
+    _provider = CollectionItemsProvider(
+      collectionId: widget.collection.id,
+      repository: context.read<CollectionItemsRepository>(),
+    )..loadItems();
   }
 
   @override
@@ -72,13 +76,14 @@ class _CollectionDetailScreenState extends State<CollectionDetailScreen> {
   }
 
   Future<void> _openAddItem() async {
-    final newItem = await Navigator.of(context).push<CollectionItem>(
-      MaterialPageRoute(builder: (context) => const AddItemScreen()),
+    await Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => ChangeNotifierProvider.value(
+          value: _provider,
+          child: const AddItemScreen(),
+        ),
+      ),
     );
-
-    if (newItem != null) {
-      _provider.addItem(newItem);
-    }
   }
 
   void _openSortSheet() {
@@ -273,7 +278,7 @@ class _CollectionDetailScreenState extends State<CollectionDetailScreen> {
               title: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(widget.title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700)),
+                  Text(widget.collection.title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700)),
                   Text(
                     itemCountText,
                     style: const TextStyle(color: Color(0xFF6C7B8F), fontSize: 12),
@@ -488,7 +493,10 @@ class _CollectionDetailScreenState extends State<CollectionDetailScreen> {
                 formatPrice: _formatPrice,
                 onTap: () => Navigator.of(context).push(
                   MaterialPageRoute(
-                    builder: (context) => ItemDetailScreen(item: item),
+                    builder: (_) => ChangeNotifierProvider.value(
+                      value: _provider,
+                      child: ItemDetailScreen(item: item),
+                    ),
                   ),
                 ),
               );
@@ -506,7 +514,10 @@ class _CollectionDetailScreenState extends State<CollectionDetailScreen> {
                 formatPrice: _formatPrice,
                 onTap: () => Navigator.of(context).push(
                   MaterialPageRoute(
-                    builder: (context) => ItemDetailScreen(item: item),
+                    builder: (_) => ChangeNotifierProvider.value(
+                      value: _provider,
+                      child: ItemDetailScreen(item: item),
+                    ),
                   ),
                 ),
               );

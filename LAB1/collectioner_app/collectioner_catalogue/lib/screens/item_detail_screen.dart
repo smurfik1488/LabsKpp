@@ -1,10 +1,60 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:trezo/models/collection_item.dart';
+import 'package:trezo/screens/add_item_screen.dart';
+import 'package:trezo/state/collection_items_provider.dart';
+import 'package:trezo/state/mutation_status.dart';
 
 class ItemDetailScreen extends StatelessWidget {
   final CollectionItem item;
 
   const ItemDetailScreen({super.key, required this.item});
+
+  Future<void> _openEdit(BuildContext context) async {
+    final provider = context.read<CollectionItemsProvider>();
+    await Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => ChangeNotifierProvider.value(
+          value: provider,
+          child: AddItemScreen(initialItem: item),
+        ),
+      ),
+    );
+  }
+
+  Future<void> _confirmDelete(BuildContext context) async {
+    final provider = context.read<CollectionItemsProvider>();
+    final shouldDelete = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Delete item?'),
+        content: const Text('This action cannot be undone.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
+    );
+
+    if (shouldDelete != true) return;
+    await provider.deleteItem(item.id);
+
+    if (!context.mounted) return;
+    if (provider.mutationStatus == MutationStatus.error) {
+      final message = provider.mutationError ?? 'Failed to delete item.';
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+      return;
+    }
+
+    provider.resetMutationStatus();
+    Navigator.of(context).pop();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -14,8 +64,12 @@ class ItemDetailScreen extends StatelessWidget {
         title: Text(item.name, overflow: TextOverflow.ellipsis),
         actions: [
           IconButton(
-            icon: const Icon(Icons.more_vert),
-            onPressed: () {},
+            icon: const Icon(Icons.edit_outlined),
+            onPressed: () => _openEdit(context),
+          ),
+          IconButton(
+            icon: const Icon(Icons.delete_outline),
+            onPressed: () => _confirmDelete(context),
           ),
         ],
       ),

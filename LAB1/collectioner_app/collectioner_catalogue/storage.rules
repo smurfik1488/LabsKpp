@@ -1,0 +1,18 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    match /collection_items/{collectionId}/{itemFile} {
+      allow read: if true;
+      allow write: if isSignedIn();
+    }
+
+    match /collection_covers/{collectionId}/{fileName} {
+      allow read: if true;
+      allow write: if isSignedIn();
+    }
+  }
+}
