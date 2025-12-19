@@ -25,17 +25,44 @@ class FirestoreCollectionsRepository implements CollectionsRepository {
 
   @override
   Stream<List<UserCollection>> watchCollections() {
+    final user = _auth.currentUser;
+    if (user == null) {
+      return const Stream.empty();
+    }
+
     return _collectionsRef
-        .orderBy('createdAt', descending: true)
+        .where('ownerId', isEqualTo: user.uid)
         .snapshots()
-        .map((snapshot) =>
-            snapshot.docs.map(UserCollection.fromFirestore).toList());
+        .map((snapshot) {
+          final items =
+              snapshot.docs.map(UserCollection.fromFirestore).toList();
+          items.sort(
+            (a, b) =>
+                (b.createdAt ?? DateTime.fromMillisecondsSinceEpoch(0))
+                    .compareTo(
+                        a.createdAt ?? DateTime.fromMillisecondsSinceEpoch(0)),
+          );
+          return items;
+        });
   }
 
   @override
   Future<List<UserCollection>> getCollections() async {
-    final snapshot = await _collectionsRef.orderBy('createdAt', descending: true).get();
-    return snapshot.docs.map(UserCollection.fromFirestore).toList();
+    final user = _auth.currentUser;
+    if (user == null) {
+      throw StateError('User must be signed in to get collections.');
+    }
+
+    final snapshot =
+        await _collectionsRef.where('ownerId', isEqualTo: user.uid).get();
+    final items = snapshot.docs.map(UserCollection.fromFirestore).toList();
+    items.sort(
+      (a, b) =>
+          (b.createdAt ?? DateTime.fromMillisecondsSinceEpoch(0))
+              .compareTo(
+                  a.createdAt ?? DateTime.fromMillisecondsSinceEpoch(0)),
+    );
+    return items;
   }
 
   @override

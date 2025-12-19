@@ -46,7 +46,7 @@ class DefaultFirebaseOptions {
     messagingSenderId: '133136651371',
     projectId: 'trezo-a5c06',
     authDomain: 'trezo-a5c06.firebaseapp.com',
-    storageBucket: 'trezo-a5c06.firebasestorage.app',
+    storageBucket: 'trezo-a5c06.appspot.com',
     measurementId: 'G-JS9EWH2S3H',
   );
 
@@ -55,15 +55,16 @@ class DefaultFirebaseOptions {
     appId: '1:133136651371:android:282aba39719a8ef61b4d2e',
     messagingSenderId: '133136651371',
     projectId: 'trezo-a5c06',
-    storageBucket: 'trezo-a5c06.firebasestorage.app',
+    storageBucket: 'trezo-a5c06.appspot.com',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyDzVsgQfRsCfbMxsocCEmzA8AwAnCAPDH4',
     appId: '1:133136651371:ios:61e8e9783dea80471b4d2e',
+    
     messagingSenderId: '133136651371',
     projectId: 'trezo-a5c06',
-    storageBucket: 'trezo-a5c06.firebasestorage.app',
+    storageBucket: 'trezo-a5c06.appspot.com',
     iosBundleId: 'com.example.collectionerCatalogue',
   );
 
@@ -72,7 +73,7 @@ class DefaultFirebaseOptions {
     appId: '1:133136651371:ios:61e8e9783dea80471b4d2e',
     messagingSenderId: '133136651371',
     projectId: 'trezo-a5c06',
-    storageBucket: 'trezo-a5c06.firebasestorage.app',
+    storageBucket: 'trezo-a5c06.appspot.com',
     iosBundleId: 'com.example.collectionerCatalogue',
   );
 
@@ -82,7 +83,7 @@ class DefaultFirebaseOptions {
     messagingSenderId: '133136651371',
     projectId: 'trezo-a5c06',
     authDomain: 'trezo-a5c06.firebaseapp.com',
-    storageBucket: 'trezo-a5c06.firebasestorage.app',
+    storageBucket: 'trezo-a5c06.appspot.com',
     measurementId: 'G-GHZKFCFSWX',
   );
 

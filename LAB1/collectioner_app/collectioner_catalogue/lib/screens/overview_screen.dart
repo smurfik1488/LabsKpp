@@ -1,69 +1,48 @@
 // lib/screens/overview_screen.dart
-import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/material.dart';
-import 'package:firebase_analytics/observer.dart';
 
 class OverviewScreen extends StatelessWidget {
   const OverviewScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final items = _demoItems;
+
     return Scaffold(
       appBar: AppBar(
         title: _buildSearchField(context),
-
         actions: [
           IconButton(
             icon: const Icon(Icons.filter_list_outlined),
             onPressed: () {},
           ),
         ],
-
-        // Використовуємо PreferredSize для розміщення кнопок фільтра під AppBar
         bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(50.0),
-
+          preferredSize: const Size.fromHeight(50),
           child: SingleChildScrollView(
             scrollDirection: Axis.horizontal,
-
-            padding: const EdgeInsets.symmetric(
-              horizontal: 16.0,
-              vertical: 8.0,
-            ),
-
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: Row(
               children: [
-                _buildFilterButton(context, 'Всі предмети', true),
-
-                _buildFilterButton(context, 'На обмін', false),
-
-                _buildFilterButton(context, 'На продаж', false),
-
-                _buildFilterButton(context, 'Рідкісні', false),
+                _buildFilterChip(context, 'Trending', true),
+                _buildFilterChip(context, 'Exchange', false),
+                _buildFilterChip(context, 'For sale', false),
+                _buildFilterChip(context, 'New', false),
               ],
             ),
           ),
         ),
       ),
-
       body: GridView.builder(
-        padding: const EdgeInsets.all(16.0),
-
+        padding: const EdgeInsets.all(16),
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 2,
-
-          crossAxisSpacing: 12.0,
-
-          mainAxisSpacing: 12.0,
-
-          childAspectRatio: 0.7, // Адаптація під розмір карток на скріншоті
+          crossAxisSpacing: 12,
+          mainAxisSpacing: 12,
+          childAspectRatio: 0.7,
         ),
-
-        itemCount: 4, // 4 hardcoded предмети
-
-        itemBuilder: (context, index) {
-          return _buildItemCard(context, index);
-        },
+        itemCount: items.length,
+        itemBuilder: (context, index) => _ItemCard(item: items[index]),
       ),
     );
   }
@@ -71,123 +50,76 @@ class OverviewScreen extends StatelessWidget {
   Widget _buildSearchField(BuildContext context) {
     return Container(
       height: 40,
-
       decoration: BoxDecoration(
         color: Theme.of(context).cardColor,
-
         borderRadius: BorderRadius.circular(12),
       ),
-
       child: const TextField(
         decoration: InputDecoration(
-          hintText: 'Пошук предметів...',
-
+          hintText: 'Search...',
           hintStyle: TextStyle(color: Color(0xFF6C7B8F), fontSize: 14),
-
           prefixIcon: Icon(Icons.search, color: Color(0xFF6C7B8F)),
-
           border: InputBorder.none,
-
           contentPadding: EdgeInsets.symmetric(vertical: 8),
         ),
       ),
     );
   }
 
-  Widget _buildFilterButton(
-    BuildContext context,
-    String text,
-    bool isSelected,
-  ) {
+  Widget _buildFilterChip(BuildContext context, String text, bool selected) {
     return Padding(
-      padding: const EdgeInsets.only(right: 8.0),
+      padding: const EdgeInsets.only(right: 8),
       child: ElevatedButton(
-        onPressed: () {
-          final FirebaseAnalytics analytics = FirebaseAnalytics.instance;
-
-          analytics.logEvent(
-            name: 'button_click',
-            parameters: {
-              'button_id': 'submit_button',
-              'screen_name': 'home_screen',
-            },
-          );
-
-        },
+        onPressed: () {},
         style: ElevatedButton.styleFrom(
-          backgroundColor: isSelected
-              ? const Color(0xFF00C6FF)
-              : Theme.of(context).cardColor,
-          foregroundColor: isSelected ? Colors.white : const Color(0xFFC7C7C7),
+          backgroundColor:
+              selected ? const Color(0xFF00C6FF) : Theme.of(context).cardColor,
+          foregroundColor: selected ? Colors.white : const Color(0xFFC7C7C7),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           elevation: 0,
         ),
-
         child: Text(text, style: const TextStyle(fontSize: 14)),
       ),
     );
   }
+}
 
-  Widget _buildItemCard(BuildContext context, int index) {
-    final List<Map<String, dynamic>> items = [
-      {
-        'title': 'Золота монета Liberty',
-        'price': '85,000',
-        'tag': 'Обмін',
-        'user': 'Олександр К.',
-        'image': 'assets/images/item_1.png',
-      },
+class _ItemCard extends StatelessWidget {
+  const _ItemCard({required this.item});
 
-      {
-        'title': 'Вінтажна марка 1960',
-        'price': '15,000',
-        'tag': 'Продаж',
-        'user': 'Марія Л.',
-        'image': 'assets/images/item_2.png',
-      },
+  final Map<String, String> item;
 
-      {
-        'title': 'Срібна монета 1921',
-        'price': '12,000',
-        'tag': 'Обмін',
-        'user': 'Дмитро В.',
-        'image': 'assets/images/item_3.png',
-      },
+  Color _tagColor(String tag) {
+    switch (tag) {
+      case 'Exchange':
+        return const Color(0xFFFF9900);
+      case 'For sale':
+        return const Color(0xFF00C853);
+      default:
+        return const Color(0xFF00C6FF);
+    }
+  }
 
-      {
-        'title': 'Антична римська монета',
-        'price': '45,000',
-        'tag': 'Продаж',
-        'user': 'Іван П.',
-        'image': 'assets/images/item_4.png',
-      },
-    ];
-
-    final item = items[index];
-
+  @override
+  Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
         color: Theme.of(context).cardColor,
-
         borderRadius: BorderRadius.circular(12),
       ),
-
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-
         children: [
           Stack(
             children: [
               ClipRRect(
-                borderRadius: const BorderRadius.vertical(
-                  top: Radius.circular(12),
-                ),
-
-                child: Image.asset(
-                  item['image'],
+                borderRadius:
+                    const BorderRadius.vertical(top: Radius.circular(12)),
+                child: Image.network(
+                  item['image'] ?? '',
                   height: 120,
                   width: double.infinity,
                   fit: BoxFit.cover,
@@ -195,28 +127,18 @@ class OverviewScreen extends StatelessWidget {
                       Container(height: 120, color: Colors.grey.shade800),
                 ),
               ),
-
               Positioned(
                 top: 8,
-
                 left: 8,
-
                 child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 4,
-                  ),
-
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
-                    color: item['tag'] == 'Обмін'
-                        ? const Color(0xFFFF9900)
-                        : const Color(0xFF00C6FF),
-
+                    color: _tagColor(item['tag'] ?? ''),
                     borderRadius: BorderRadius.circular(8),
                   ),
-
                   child: Text(
-                    item['tag'],
+                    item['tag'] ?? '',
                     style: const TextStyle(
                       color: Colors.black,
                       fontSize: 12,
@@ -225,50 +147,34 @@ class OverviewScreen extends StatelessWidget {
                   ),
                 ),
               ),
-
               const Positioned(
                 top: 8,
-
                 right: 8,
-
-                child: Icon(
-                  Icons.favorite_border,
-                  color: Colors.white,
-                  size: 20,
-                ),
+                child: Icon(Icons.favorite_border,
+                    color: Colors.white, size: 20),
               ),
             ],
           ),
-
           Padding(
             padding: const EdgeInsets.all(12.0),
-
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-
               children: [
                 Text(
-                  item['title'],
+                  item['title'] ?? '',
                   style: const TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 16,
                   ),
                 ),
-
                 const SizedBox(height: 4),
-
                 Row(
                   children: [
-                    const Icon(
-                      Icons.person_outline,
-                      size: 14,
-                      color: Color(0xFF6C7B8F),
-                    ),
-
+                    const Icon(Icons.person_outline,
+                        size: 14, color: Color(0xFF6C7B8F)),
                     const SizedBox(width: 4),
-
                     Text(
-                      item['user'],
+                      item['user'] ?? '',
                       style: const TextStyle(
                         fontSize: 12,
                         color: Color(0xFF6C7B8F),
@@ -276,11 +182,9 @@ class OverviewScreen extends StatelessWidget {
                     ),
                   ],
                 ),
-
                 const SizedBox(height: 8),
-
                 Text(
-                  '₴${item['price']}',
+                  '\$${item['price']}',
                   style: const TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 18,
@@ -295,3 +199,38 @@ class OverviewScreen extends StatelessWidget {
     );
   }
 }
+
+const List<Map<String, String>> _demoItems = [
+  {
+    'title': 'Liberty collection coin',
+    'price': '85,000',
+    'tag': 'Exchange',
+    'user': 'Max T.',
+    'image':
+        'https://images.unsplash.com/photo-1457369804613-52c61a468e7d?auto=format&fit=crop&w=800&q=80',
+  },
+  {
+    'title': 'Vintage banknote 1960',
+    'price': '15,000',
+    'tag': 'For sale',
+    'user': 'Anna P.',
+    'image':
+        'https://images.unsplash.com/photo-1545239351-1141bd82e8a6?auto=format&fit=crop&w=800&q=80',
+  },
+  {
+    'title': 'Rare coin 1921',
+    'price': '12,000',
+    'tag': 'Exchange',
+    'user': 'John S.',
+    'image':
+        'https://images.unsplash.com/photo-1512428559087-560fa5ceab42?auto=format&fit=crop&w=800&q=80',
+  },
+  {
+    'title': 'Collector’s note set',
+    'price': '45,000',
+    'tag': 'For sale',
+    'user': 'Eva L.',
+    'image':
+        'https://images.unsplash.com/photo-1462396881884-de2c07cb95ed?auto=format&fit=crop&w=800&q=80',
+  },
+];

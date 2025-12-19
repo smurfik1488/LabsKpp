@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
@@ -69,11 +70,16 @@ class _AddCollectionScreenState extends State<AddCollectionScreen> {
     if (_pickedImageBytes == null) return null;
     setState(() => _isUploading = true);
     try {
-      final result = await storage.uploadCollectionImage(
-        collectionId: collectionId,
-        bytes: _pickedImageBytes!,
-      );
+      final result = await storage
+          .uploadCollectionImage(
+            collectionId: collectionId,
+            bytes: _pickedImageBytes!,
+          )
+          .timeout(const Duration(seconds: 20));
       return result;
+    } on TimeoutException {
+      _uploadError = 'Image upload timed out.';
+      return null;
     } catch (e) {
       _uploadError = 'Failed to upload image.';
       return null;
@@ -108,58 +114,56 @@ class _AddCollectionScreenState extends State<AddCollectionScreen> {
       updatedAt: widget.initialCollection?.updatedAt,
     );
 
-    if (isEditing) {
-      if (_pickedImageBytes != null) {
-        final upload = await _uploadCoverImage(storage, baseCollection.id);
-        if (upload == null) {
-          if (mounted && _uploadError != null) {
-            ScaffoldMessenger.of(context)
-                .showSnackBar(SnackBar(content: Text(_uploadError!)));
+    try {
+      if (isEditing) {
+        if (_pickedImageBytes != null) {
+          final upload = await _uploadCoverImage(storage, baseCollection.id);
+          final updatedImageUrl = upload?.downloadUrl ?? baseCollection.imageUrl;
+          final updatedImagePath = upload?.path ?? baseCollection.imagePath;
+
+          await provider.updateCollection(
+            baseCollection.copyWith(
+              imageUrl: updatedImageUrl,
+              imagePath: updatedImagePath,
+            ),
+          );
+
+          final previousPath = widget.initialCollection?.imagePath;
+          if (upload != null && previousPath != null && previousPath != upload.path) {
+            try {
+              await storage.deleteImage(previousPath);
+            } catch (_) {}
           }
-          return;
-        }
-        await provider.updateCollection(
-          baseCollection.copyWith(
-            imageUrl: upload.downloadUrl,
-            imagePath: upload.path,
-          ),
-        );
-        final previousPath = widget.initialCollection?.imagePath;
-        if (previousPath != null && previousPath != upload.path) {
-          try {
-            await storage.deleteImage(previousPath);
-          } catch (_) {}
+        } else {
+          final effectiveUrl =
+              imageUrlValue.isEmpty ? widget.initialCollection!.imageUrl : imageUrlValue;
+          await provider.updateCollection(baseCollection.copyWith(imageUrl: effectiveUrl));
         }
       } else {
-        final effectiveUrl =
-            imageUrlValue.isEmpty ? widget.initialCollection!.imageUrl : imageUrlValue;
-        await provider.updateCollection(baseCollection.copyWith(imageUrl: effectiveUrl));
+        final created = await provider.createCollection(baseCollection);
+        if (created == null) {
+          return;
+        }
+
+        if (_pickedImageBytes != null) {
+          final upload = await _uploadCoverImage(storage, created.id);
+          final updated = created.copyWith(
+            imageUrl: upload?.downloadUrl ?? fallbackImageUrl,
+            imagePath: upload?.path ?? created.imagePath,
+          );
+          await provider.updateCollection(updated);
+        } else {
+          await provider.updateCollection(created.copyWith(imageUrl: fallbackImageUrl));
+        }
       }
-    } else {
-      final created = await provider.createCollection(baseCollection);
-      if (created == null) return;
-      if (_pickedImageBytes != null) {
-        final upload = await _uploadCoverImage(storage, created.id);
-        if (upload == null) {
-          if (mounted && _uploadError != null) {
-            ScaffoldMessenger.of(context)
-                .showSnackBar(SnackBar(content: Text(_uploadError!)));
-          }
-          return;
-        }
-        await provider.updateCollection(
-          created.copyWith(imageUrl: upload.downloadUrl, imagePath: upload.path),
-        );
-      } else {
-        await provider.updateCollection(created.copyWith(imageUrl: fallbackImageUrl));
+    } finally {
+      if (mounted && _uploadError != null) {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(_uploadError!)));
       }
     }
 
     if (!mounted) return;
-    if (_uploadError != null) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(_uploadError!)));
-      return;
-    }
     if (provider.mutationStatus == MutationStatus.error) {
       final message = provider.mutationError ?? 'Failed to save collection.';
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));

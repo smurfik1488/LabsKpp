@@ -23,7 +23,6 @@ Future<void> main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  await _configureEmulators();
   FlutterError.onError = FirebaseCrashlytics.instance.recordFlutterFatalError;
 
   PlatformDispatcher.instance.onError = (error, stack) {
@@ -32,45 +31,6 @@ Future<void> main() async {
   };
 
   runApp(const CollectionerCatalogueApp());
-}
-
-Future<void> _configureEmulators() async {
-  if (kReleaseMode) {
-    return;
-  }
-
-  const useAllEmulators =
-      bool.fromEnvironment('USE_FIREBASE_EMULATORS', defaultValue: false);
-  const useAuthEmulator = useAllEmulators ||
-      bool.fromEnvironment('USE_AUTH_EMULATOR', defaultValue: false);
-  const useFirestoreEmulator = useAllEmulators ||
-      bool.fromEnvironment('USE_FIRESTORE_EMULATOR', defaultValue: false);
-  const useStorageEmulator = useAllEmulators ||
-      bool.fromEnvironment('USE_STORAGE_EMULATOR', defaultValue: true);
-
-  if (!useAuthEmulator && !useFirestoreEmulator && !useStorageEmulator) {
-    return;
-  }
-
-  const definedHost =
-      String.fromEnvironment('FIREBASE_EMULATOR_HOST', defaultValue: '');
-  if (definedHost.isEmpty) {
-    debugPrint(
-      'FIREBASE_EMULATOR_HOST is not set. Skipping emulator configuration.',
-    );
-    return;
-  }
-  final host = definedHost;
-
-  if (useAuthEmulator) {
-    FirebaseAuth.instance.useAuthEmulator(host, 9099);
-  }
-  if (useFirestoreEmulator) {
-    FirebaseFirestore.instance.useFirestoreEmulator(host, 8080);
-  }
-  if (useStorageEmulator) {
-    FirebaseStorage.instance.useStorageEmulator(host, 1488);
-  }
 }
 
 class CollectionerCatalogueApp extends StatelessWidget {

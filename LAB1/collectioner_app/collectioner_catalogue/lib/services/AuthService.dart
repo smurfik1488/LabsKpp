@@ -1,17 +1,25 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  // 🔹 Вхід через Google
+  // а?"ь ђ'‘:‘-ђ? ‘Шђз‘?ђзђъ Google
   Future<User?> signInWithGoogle() async {
     try {
+      // На web використовуємо вбудований popup Firebase, щоб уникати проблем із блокованими вікнами.
+      if (kIsWeb) {
+        final googleProvider = GoogleAuthProvider()..addScope('email');
+        final result = await _auth.signInWithPopup(googleProvider);
+        return result.user;
+      }
+
       final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
-      if (googleUser == null) return null; // Користувач скасував
+      if (googleUser == null) return null; // ђ?ђ?‘?ђс‘?‘'‘?ђ?ђш‘Ш ‘?ђуђш‘?‘?ђ?ђшђ?
 
       final GoogleSignInAuthentication googleAuth =
-      await googleUser.authentication;
+          await googleUser.authentication;
 
       final credential = GoogleAuthProvider.credential(
         accessToken: googleAuth.accessToken,
@@ -19,7 +27,7 @@ class AuthService {
       );
 
       final UserCredential userCredential =
-      await _auth.signInWithCredential(credential);
+          await _auth.signInWithCredential(credential);
 
       return userCredential.user;
     } catch (e) {
